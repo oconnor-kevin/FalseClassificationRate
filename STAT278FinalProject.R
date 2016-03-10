@@ -139,6 +139,11 @@ FCR_naive = c(); class_vec_naive = c(); false_class_vec_naive = c()
 FCR_1 = c(); class_vec_1 = c(); false_class_vec_1 = c()
 FCR_2 = c(); class_vec_2 = c(); false_class_vec_2 = c()
 FCR_3 = c(); class_vec_3 = c(); false_class_vec_3 = c()
+# Initializing matrices of false classifications.
+class_mat_naive = matrix(rep(0, 100), nrow=10)
+class_mat_1 = matrix(rep(0,100), nrow=10)
+class_mat_2 = matrix(rep(0,100), nrow=10)
+class_mat_3 = matrix(rep(0,100), nrow=10)
 for (j in 1:length(p_o_vec)){
 	p_o = p_o_vec[j]
 	d_o = d_o_vec[j]
@@ -153,11 +158,16 @@ for (j in 1:length(p_o_vec)){
 		pred_labels_1 = c(pred_labels_1, select1(pvec, p_o))
 		pred_labels_2 = c(pred_labels_2, select2(pvec, d_o))
 		pred_labels_3 = c(pred_labels_3, select3(pvec, e))
-		# Counting false classifications
+		# Counting false classifications.
 		if (pred_labels_naive[i] != labels[i]){false_class_naive = false_class_naive + 1}
 		if (pred_labels_1[i] != labels[i] && pred_labels_1[i] != 0){false_class_1 = false_class_1 + 1}
 		if (pred_labels_2[i] != labels[i] && pred_labels_2[i] != 0){false_class_2 = false_class_2 + 1}
 		if (pred_labels_3[i] != labels[i] && pred_labels_3[i] != 0){false_class_3 = false_class_3 + 1}
+		# Updating classification matrices.
+		class_mat_naive[labels[i], pred_labels_naive[i]] = class_mat_naive[labels[i], pred_labels_naive[i]]+1
+		class_mat_1[labels[i], pred_labels_1[i]] = class_mat_1[labels[i], pred_labels_1[i]]+1
+		class_mat_2[labels[i], pred_labels_2[i]] = class_mat_2[labels[i], pred_labels_2[i]]+1
+		class_mat_3[labels[i], pred_labels_3[i]] = class_mat_3[labels[i], pred_labels_3[i]]+1
 	}
 	# Updating vectors.
 	class_vec_naive = c(class_vec_naive, length(pred_labels_naive[pred_labels_naive != 0]))
