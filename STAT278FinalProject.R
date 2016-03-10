@@ -65,7 +65,7 @@ gen_pvec <- function(val, means){
 	return(2*(1 - pnorm(abs(rep(val, length(means)) - means)/sdev)))
 }
 
-# Predicting labels for the generated data.
+# Predicting labels for the generated data for a constant set of threshold values.
 p_o = 0.8; d_o = 0.2; e = 0.1
 pred_labels_naive = c(); false_class_naive = 0
 pred_labels_1 = c(); false_class_1 = 0
@@ -112,6 +112,7 @@ cat("FCR: ", false_class_3/length(pred_labels_3[pred_labels_3 != 0]))
 
 
 # Examining the FCR for a range of threshold values.
+m = 10; sdev = sqrt(5); mu_range = c(-50, 50)
 mu = runif(m, min=mu_range[1], max=mu_range[2]) # generate class means
 data = c(); labels = c()
 for (i in 1:10){
@@ -120,7 +121,7 @@ for (i in 1:10){
 }
 
 # Saving randomly generated means.
-sink("STAT278FinalProjectMeans.txt")
+sink("STAT278FinalProjectMeans1.txt")
 print(mu)
 sink()
 
@@ -129,10 +130,12 @@ sink("STAT278FinalProjectData1.txt")
 print(data)
 sink()
 
+# Creating vectors of threshold values to be used.
 p_o_vec = seq(0,1,0.01)
 d_o_vec = seq(0,1,0.01)
 e_vec = seq(0,1,0.01)
-FCR_naive = c(); class_vec_naive = c(); false_class_vec_naive = c() 
+# Initializing vectors of FCR, number of classifications, and number of false classifications.
+FCR_naive = c(); class_vec_naive = c(); false_class_vec_naive = c()
 FCR_1 = c(); class_vec_1 = c(); false_class_vec_1 = c()
 FCR_2 = c(); class_vec_2 = c(); false_class_vec_2 = c()
 FCR_3 = c(); class_vec_3 = c(); false_class_vec_3 = c()
@@ -156,13 +159,22 @@ for (j in 1:length(p_o_vec)){
 		if (pred_labels_2[i] != labels[i] && pred_labels_2[i] != 0){false_class_2 = false_class_2 + 1}
 		if (pred_labels_3[i] != labels[i] && pred_labels_3[i] != 0){false_class_3 = false_class_3 + 1}
 	}
-	FCR_naive = c(FCR_naive, false_class_naive/length(pred_labels_naive[pred_labels_naive != 0]))
-	FCR_1 = c(FCR_1, false_class_1/length(pred_labels_1[pred_labels_1 != 0]))
-	FCR_2 = c(FCR_2, false_class_2/length(pred_labels_2[pred_labels_2 != 0]))
-	FCR_3 = c(FCR_3, false_class_3/length(pred_labels_3[pred_labels_3 != 0]))
+	# Updating vectors.
+	class_vec_naive = c(class_vec_naive, length(pred_labels_naive[pred_labels_naive != 0]))
+	class_vec_1 = c(class_vec_1, length(pred_labels_1[pred_labels_1 != 0]))
+	class_vec_2 = c(class_vec_2, length(pred_labels_2[pred_labels_2 != 0]))
+	class_vec_3 = c(class_vec_3, length(pred_labels_3[pred_labels_3 != 0]))
+	false_class_vec_naive = c(false_class_vec_naive, false_class_naive)
+	false_class_vec_1 = c(false_class_vec_1, false_class_1)
+	false_class_vec_2 = c(false_class_vec_2, false_class_2)
+	false_class_vec_3 = c(false_class_vec_3, false_class_3)
+	FCR_naive = c(FCR_naive, false_class_naive/class_vec_naive[j])
+	FCR_1 = c(FCR_1, false_class_1/class_vec_1[j])
+	FCR_2 = c(FCR_2, false_class_2/class_vec_2[j])
+	FCR_3 = c(FCR_3, false_class_3/class_vec_3[j])
 }
 
-# Plotting the FCR
+# Plotting the FCR.
 pdf("STAT278FinalProjectPlot1.pdf", width=7, height=5)
 plot(FCR_naive, main="FCR for Naive Selection", ylim=c(0,1), xlab="", ylab="FCR")
 dev.off()
@@ -171,16 +183,27 @@ plot(p_o_vec, FCR_1, main="FCR for Selection Rule I", ylim=c(0,1), xlab="p_o", y
 abline(h=FCR_naive[1])
 dev.off()
 pdf("STAT278FinalProjectPlot3.pdf", width=7, height=5)
-plot(FCR_2, main="FCR for Selection Rule II", ylim=c(0,1), xlab="d_o", ylab="FCR")
+plot(d_o_vec, FCR_2, main="FCR for Selection Rule II", ylim=c(0,1), xlab="d_o", ylab="FCR")
 abline(h=FCR_naive[1])
 dev.off()
 pdf("STAT278FinalProjectPlot4.pdf", width=7, height=5)
-plot(FCR_3, main="FCR for Selection Rule III", ylim=c(0,1), xlab="e", ylab="FCR")
+plot(e_vec, FCR_3, main="FCR for Selection Rule III", ylim=c(0,1), xlab="e", ylab="FCR")
 abline(h=FCR_naive[1])
 dev.off()
 
-
-
+# Plotting percentage classified.
+pdf("STAT278FinalProjectPlot5.pdf", width=7, height=5)
+plot(class_vec_naive/length(data), main="Percent Classified by Naive Selection", ylim=c(0,1), xlab="", ylab="Percent Classified")
+dev.off()
+pdf("STAT278FinalProjectPlot6.pdf", width=7, height=5)
+plot(p_o_vec, class_vec_1/length(data), main="Percent Classified by Selection Rule I", ylim=c(0,1), xlab="p_o", ylab="Percent Classified")
+dev.off()
+pdf("STAT278FinalProjectPlot7.pdf", width=7, height=5)
+plot(d_o_vec, class_vec_2/length(data), main="Percent Classified by Selection Rule II", ylim=c(0,1), xlab="d_o", ylab="Percent Classified")
+dev.off()
+pdf("STAT278FinalProjectPlot8.pdf", width=7, height=5)
+plot(e_vec, class_vec_3/length(data), main="Percent Classified by Selection Rule III", ylim=c(0,1), xlab="e", ylab="Percent Classified")
+dev.off()
 
 
 
