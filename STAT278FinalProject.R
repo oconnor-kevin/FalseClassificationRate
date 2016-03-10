@@ -121,14 +121,14 @@ for (i in 1:10){
 }
 
 # Saving randomly generated means.
-sink("STAT278FinalProjectMeans1.txt")
+#sink("STAT278FinalProjectMeans1.txt")
 print(mu)
-sink()
+#sink()
 
 # Saving data.
-sink("STAT278FinalProjectData1.txt")
+#sink("STAT278FinalProjectData1.txt")
 print(data)
-sink()
+#sink()
 
 # Creating vectors of threshold values to be used.
 p_o_vec = seq(0,1,0.01)
@@ -185,35 +185,35 @@ for (j in 1:length(p_o_vec)){
 }
 
 # Plotting the FCR.
-pdf("STAT278FinalProjectPlot1.pdf", width=7, height=5)
+#pdf("STAT278FinalProjectPlot1.pdf", width=7, height=5)
 plot(FCR_naive, main="FCR for Naive Selection", ylim=c(0,1), xlab="", ylab="FCR")
-dev.off()
-pdf("STAT278FinalProjectPlot2.pdf", width=7, height=5)
+#dev.off()
+#pdf("STAT278FinalProjectPlot2.pdf", width=7, height=5)
 plot(p_o_vec, FCR_1, main="FCR for Selection Rule I", ylim=c(0,1), xlab="p_o", ylab="FCR")
 abline(h=FCR_naive[1])
-dev.off()
-pdf("STAT278FinalProjectPlot3.pdf", width=7, height=5)
+#dev.off()
+#pdf("STAT278FinalProjectPlot3.pdf", width=7, height=5)
 plot(d_o_vec, FCR_2, main="FCR for Selection Rule II", ylim=c(0,1), xlab="d_o", ylab="FCR")
 abline(h=FCR_naive[1])
-dev.off()
-pdf("STAT278FinalProjectPlot4.pdf", width=7, height=5)
+#dev.off()
+#pdf("STAT278FinalProjectPlot4.pdf", width=7, height=5)
 plot(e_vec, FCR_3, main="FCR for Selection Rule III", ylim=c(0,1), xlab="e", ylab="FCR")
 abline(h=FCR_naive[1])
-dev.off()
+#dev.off()
 
 # Plotting percentage classified.
-pdf("STAT278FinalProjectPlot5.pdf", width=7, height=5)
+#pdf("STAT278FinalProjectPlot5.pdf", width=7, height=5)
 plot(class_vec_naive/length(data), main="Percent Classified by Naive Selection", ylim=c(0,1), xlab="", ylab="Percent Classified")
-dev.off()
-pdf("STAT278FinalProjectPlot6.pdf", width=7, height=5)
+#dev.off()
+#pdf("STAT278FinalProjectPlot6.pdf", width=7, height=5)
 plot(p_o_vec, class_vec_1/length(data), main="Percent Classified by Selection Rule I", ylim=c(0,1), xlab="p_o", ylab="Percent Classified")
-dev.off()
-pdf("STAT278FinalProjectPlot7.pdf", width=7, height=5)
+#dev.off()
+#pdf("STAT278FinalProjectPlot7.pdf", width=7, height=5)
 plot(d_o_vec, class_vec_2/length(data), main="Percent Classified by Selection Rule II", ylim=c(0,1), xlab="d_o", ylab="Percent Classified")
-dev.off()
-pdf("STAT278FinalProjectPlot8.pdf", width=7, height=5)
+#dev.off()
+#pdf("STAT278FinalProjectPlot8.pdf", width=7, height=5)
 plot(e_vec, class_vec_3/length(data), main="Percent Classified by Selection Rule III", ylim=c(0,1), xlab="e", ylab="Percent Classified")
-dev.off()
+#dev.off()
 
 # Testing discernibility between overlapping classes.
 # Classes 2 and 8.
