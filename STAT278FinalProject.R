@@ -215,7 +215,17 @@ pdf("STAT278FinalProjectPlot8.pdf", width=7, height=5)
 plot(e_vec, class_vec_3/length(data), main="Percent Classified by Selection Rule III", ylim=c(0,1), xlab="e", ylab="Percent Classified")
 dev.off()
 
-
+# Testing discernibility between overlapping classes.
+# Classes 2 and 8.
+print((class_mat_naive[2,8]+class_mat_naive[8,2])/(sum(class_mat_naive[2,])+sum(class_mat_naive[8,])))
+print((class_mat_1[2,8]+class_mat_1[8,2])/(sum(class_mat_1[2,])+sum(class_mat_1[8,])))
+print((class_mat_2[2,8]+class_mat_2[8,2])/(sum(class_mat_2[2,])+sum(class_mat_2[8,])))
+print((class_mat_3[2,8]+class_mat_3[8,2])/(sum(class_mat_3[2,])+sum(class_mat_3[8,])))
+# Classes 6, 7 and 9. 
+print((class_mat_naive[6,7]+class_mat_naive[6,9]+class_mat_naive[7,6]+class_mat_naive[7,9]+class_mat_naive[9,6]+class_mat_naive[9,7])/(sum(class_mat_naive[6,])+sum(class_mat_naive[7,])+sum(class_mat_naive[9,])))
+print((class_mat_1[6,7]+class_mat_1[6,9]+class_mat_1[7,6]+class_mat_1[7,9]+class_mat_1[9,6]+class_mat_1[9,7])/(sum(class_mat_1[6,])+sum(class_mat_1[7,])+sum(class_mat_1[9,])))
+print((class_mat_2[6,7]+class_mat_2[6,9]+class_mat_2[7,6]+class_mat_2[7,9]+class_mat_2[9,6]+class_mat_2[9,7])/(sum(class_mat_2[6,])+sum(class_mat_2[7,])+sum(class_mat_2[9,])))
+print((class_mat_3[6,7]+class_mat_3[6,9]+class_mat_3[7,6]+class_mat_3[7,9]+class_mat_3[9,6]+class_mat_3[9,7])/(sum(class_mat_3[6,])+sum(class_mat_3[7,])+sum(class_mat_3[9,])))
 
 
 
