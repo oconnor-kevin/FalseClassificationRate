@@ -229,3 +229,125 @@ print((class_mat_3[6,7]+class_mat_3[6,9]+class_mat_3[7,6]+class_mat_3[7,9]+class
 
 
 
+# Testing selection rules in a low-overlap setting.
+# Generating data from evenly spaced means.
+m = 10; sdev = sqrt(5); mu_range = c(5, 50)
+mu = seq(mu_range[1], mu_range[2], 5) # generate class means
+data = c(); labels = c()
+for (i in 1:10){
+	data = c(data, rnorm(100, mean=mu[i], sd=sdev)) # generate data from class i
+	labels = c(labels, rep(i, 100)) # construct vector of true labels
+}
+
+# Saving randomly generated means.
+#sink("STAT278FinalProjectMeans2.txt")
+print(mu)
+#sink()
+
+# Saving data.
+#sink("STAT278FinalProjectData2.txt")
+print(data)
+#sink()
+
+# Creating vectors of threshold values to be used.
+p_o_vec = seq(0,1,0.01)
+d_o_vec = seq(0,1,0.01)
+e_vec = seq(0,1,0.01)
+# Initializing vectors of FCR, number of classifications, and number of false classifications.
+FCR_naive = c(); class_vec_naive = c(); false_class_vec_naive = c()
+FCR_1 = c(); class_vec_1 = c(); false_class_vec_1 = c()
+FCR_2 = c(); class_vec_2 = c(); false_class_vec_2 = c()
+FCR_3 = c(); class_vec_3 = c(); false_class_vec_3 = c()
+# Initializing matrices of false classifications.
+class_mat_naive = matrix(rep(0, 100), nrow=10)
+class_mat_1 = matrix(rep(0,100), nrow=10)
+class_mat_2 = matrix(rep(0,100), nrow=10)
+class_mat_3 = matrix(rep(0,100), nrow=10)
+for (j in 1:length(p_o_vec)){
+	p_o = p_o_vec[j]
+	d_o = d_o_vec[j]
+	e = e_vec[j]
+	pred_labels_naive = c(); false_class_naive = 0
+	pred_labels_1 = c(); false_class_1 = 0
+	pred_labels_2 = c(); false_class_2 = 0
+	pred_labels_3 = c(); false_class_3 = 0
+	for (i in 1:length(data)){
+		pvec = gen_pvec(data[i], mu)
+		pred_labels_naive = c(pred_labels_naive, naiveselect(pvec))
+		pred_labels_1 = c(pred_labels_1, select1(pvec, p_o))
+		pred_labels_2 = c(pred_labels_2, select2(pvec, d_o))
+		pred_labels_3 = c(pred_labels_3, select3(pvec, e))
+		# Counting false classifications.
+		if (pred_labels_naive[i] != labels[i]){false_class_naive = false_class_naive + 1}
+		if (pred_labels_1[i] != labels[i] && pred_labels_1[i] != 0){false_class_1 = false_class_1 + 1}
+		if (pred_labels_2[i] != labels[i] && pred_labels_2[i] != 0){false_class_2 = false_class_2 + 1}
+		if (pred_labels_3[i] != labels[i] && pred_labels_3[i] != 0){false_class_3 = false_class_3 + 1}
+		# Updating classification matrices.
+		class_mat_naive[labels[i], pred_labels_naive[i]] = class_mat_naive[labels[i], pred_labels_naive[i]]+1
+		class_mat_1[labels[i], pred_labels_1[i]] = class_mat_1[labels[i], pred_labels_1[i]]+1
+		class_mat_2[labels[i], pred_labels_2[i]] = class_mat_2[labels[i], pred_labels_2[i]]+1
+		class_mat_3[labels[i], pred_labels_3[i]] = class_mat_3[labels[i], pred_labels_3[i]]+1
+	}
+	# Updating vectors.
+	class_vec_naive = c(class_vec_naive, length(pred_labels_naive[pred_labels_naive != 0]))
+	class_vec_1 = c(class_vec_1, length(pred_labels_1[pred_labels_1 != 0]))
+	class_vec_2 = c(class_vec_2, length(pred_labels_2[pred_labels_2 != 0]))
+	class_vec_3 = c(class_vec_3, length(pred_labels_3[pred_labels_3 != 0]))
+	false_class_vec_naive = c(false_class_vec_naive, false_class_naive)
+	false_class_vec_1 = c(false_class_vec_1, false_class_1)
+	false_class_vec_2 = c(false_class_vec_2, false_class_2)
+	false_class_vec_3 = c(false_class_vec_3, false_class_3)
+	FCR_naive = c(FCR_naive, false_class_naive/class_vec_naive[j])
+	FCR_1 = c(FCR_1, false_class_1/class_vec_1[j])
+	FCR_2 = c(FCR_2, false_class_2/class_vec_2[j])
+	FCR_3 = c(FCR_3, false_class_3/class_vec_3[j])
+}
+
+# Plotting the FCR.
+#pdf("STAT278FinalProjectPlot9.pdf", width=7, height=5)
+plot(FCR_naive, main="FCR for Naive Selection", ylim=c(0,1), xlab="", ylab="FCR")
+#dev.off()
+#pdf("STAT278FinalProjectPlot10.pdf", width=7, height=5)
+plot(p_o_vec, FCR_1, main="FCR for Selection Rule I", ylim=c(0,1), xlab="p_o", ylab="FCR")
+abline(h=FCR_naive[1])
+#dev.off()
+#pdf("STAT278FinalProjectPlot11.pdf", width=7, height=5)
+plot(d_o_vec, FCR_2, main="FCR for Selection Rule II", ylim=c(0,1), xlab="d_o", ylab="FCR")
+abline(h=FCR_naive[1])
+#dev.off()
+#pdf("STAT278FinalProjectPlot12.pdf", width=7, height=5)
+plot(e_vec, FCR_3, main="FCR for Selection Rule III", ylim=c(0,1), xlab="e", ylab="FCR")
+abline(h=FCR_naive[1])
+#dev.off()
+
+# Plotting percentage classified.
+#pdf("STAT278FinalProjectPlot13.pdf", width=7, height=5)
+plot(class_vec_naive/length(data), main="Percent Classified by Naive Selection", ylim=c(0,1), xlab="", ylab="Percent Classified")
+#dev.off()
+#pdf("STAT278FinalProjectPlot14.pdf", width=7, height=5)
+plot(p_o_vec, class_vec_1/length(data), main="Percent Classified by Selection Rule I", ylim=c(0,1), xlab="p_o", ylab="Percent Classified")
+#dev.off()
+#pdf("STAT278FinalProjectPlot15.pdf", width=7, height=5)
+plot(d_o_vec, class_vec_2/length(data), main="Percent Classified by Selection Rule II", ylim=c(0,1), xlab="d_o", ylab="Percent Classified")
+#dev.off()
+#pdf("STAT278FinalProjectPlot16.pdf", width=7, height=5)
+plot(e_vec, class_vec_3/length(data), main="Percent Classified by Selection Rule III", ylim=c(0,1), xlab="e", ylab="Percent Classified")
+#dev.off()
+
+
+
+# Testing on MNIST data.
+# Loading data.
+#train_images_bin = file("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/train-images-idx3-ubyte", "rb")
+#train_labels_bin = file("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/train-labels-idx1-ubyte", "rb")
+#test_images_bin = file("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/t10k-images-idx3-ubyte", "rb")
+#test_labels_bin = file("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/t10k-labels-idx1-ubyte", "rb")
+#m = matrix(readBin(train_images_bin, integer(), size=1, n=28*28, endian="big"), 28, 28)
+#image(m)
+#library(darch)
+#readMNIST("MNISTdata/")
+#load("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/test.RData")
+#load("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/train.RData")
+
+
+
