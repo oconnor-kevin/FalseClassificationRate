@@ -1,8 +1,9 @@
 # Kevin O'Connor
 # STAT27850
+# Error Measure and Control in Multiclass Statistical Classification
 
 
-# Calculating probability of false classification X_i with l labels and true class probability p_i based on naive selection rule.
+## Calculating probability of false classification X_i with l labels and true class probability p_i based on naive selection rule.
 probcalc <- function(k, l, p_i){
 	return((-1)^(k+1)*choose(l-1,k)*(1-p_i)^k)
 }
@@ -11,7 +12,7 @@ return(sum(probcalc(1:9, 10, 0.99))) #0.08648275
 
 
 
-# Defining selection rules.
+## Defining selection rules.
 # Naive selection simply returns the class which corresponds to the maximum element of the vector of estimated pvalues.  
 naiveselect <- function(pvec){
 	return(which(pvec==max(pvec)))
@@ -51,18 +52,19 @@ select3 <- function(pvec, e){
 
 
 
-# Testing selection rules using artificial data.
+## Measuring FCR for each selection rule at specific instance of threshold value.
+# Function for generating a vector of estimated p-values.
+gen_pvec <- function(val, means){
+	return(2*(1 - pnorm(abs(rep(val, length(means)) - means)/sdev)))
+}
+
+# Generating class means and data.
 m = 10; sdev = sqrt(5); mu_range = c(-100, 100)
 mu = runif(m, min=mu_range[1], max=mu_range[2]) # generate class means
 data = c(); labels = c()
 for (i in 1:10){
 	data = c(data, rnorm(100, mean=mu[i], sd=sdev)) # generate data from class i
 	labels = c(labels, rep(i, 100)) # construct vector of true labels
-}
-
-# Function for generating a vector of estimated p-values.
-gen_pvec <- function(val, means){
-	return(2*(1 - pnorm(abs(rep(val, length(means)) - means)/sdev)))
 }
 
 # Predicting labels for the generated data for a constant set of threshold values.
@@ -111,7 +113,8 @@ cat("FCR: ", false_class_3/length(pred_labels_3[pred_labels_3 != 0]))
 
 
 
-# Examining the FCR for a range of threshold values.
+## Examining the FCR for a range of threshold values in high-overlap setting.
+# Reseting means and generating data.
 m = 10; sdev = sqrt(5); mu_range = c(-50, 50)
 mu = runif(m, min=mu_range[1], max=mu_range[2]) # generate class means
 data = c(); labels = c()
@@ -144,6 +147,7 @@ class_mat_naive = matrix(rep(0, 100), nrow=10)
 class_mat_1 = matrix(rep(0,100), nrow=10)
 class_mat_2 = matrix(rep(0,100), nrow=10)
 class_mat_3 = matrix(rep(0,100), nrow=10)
+# Looping through all threshold values.
 for (j in 1:length(p_o_vec)){
 	p_o = p_o_vec[j]
 	d_o = d_o_vec[j]
@@ -152,6 +156,7 @@ for (j in 1:length(p_o_vec)){
 	pred_labels_1 = c(); false_class_1 = 0
 	pred_labels_2 = c(); false_class_2 = 0
 	pred_labels_3 = c(); false_class_3 = 0
+	# Looping through all instances.
 	for (i in 1:length(data)){
 		pvec = gen_pvec(data[i], mu)
 		pred_labels_naive = c(pred_labels_naive, naiveselect(pvec))
@@ -229,7 +234,7 @@ print((class_mat_3[6,7]+class_mat_3[6,9]+class_mat_3[7,6]+class_mat_3[7,9]+class
 
 
 
-# Testing selection rules in a low-overlap setting.
+## Testing selection rules in a low-overlap setting.
 # Generating data from evenly spaced means.
 m = 10; sdev = sqrt(5); mu_range = c(5, 50)
 mu = seq(mu_range[1], mu_range[2], 5) # generate class means
@@ -263,6 +268,7 @@ class_mat_naive = matrix(rep(0, 100), nrow=10)
 class_mat_1 = matrix(rep(0,100), nrow=10)
 class_mat_2 = matrix(rep(0,100), nrow=10)
 class_mat_3 = matrix(rep(0,100), nrow=10)
+# Looping through all threshold values.
 for (j in 1:length(p_o_vec)){
 	p_o = p_o_vec[j]
 	d_o = d_o_vec[j]
@@ -271,6 +277,7 @@ for (j in 1:length(p_o_vec)){
 	pred_labels_1 = c(); false_class_1 = 0
 	pred_labels_2 = c(); false_class_2 = 0
 	pred_labels_3 = c(); false_class_3 = 0
+	# Looping through instances.
 	for (i in 1:length(data)){
 		pvec = gen_pvec(data[i], mu)
 		pred_labels_naive = c(pred_labels_naive, naiveselect(pvec))
@@ -333,21 +340,3 @@ plot(d_o_vec, class_vec_2/length(data), main="Percent Classified by Selection Ru
 #pdf("STAT278FinalProjectPlot16.pdf", width=7, height=5)
 plot(e_vec, class_vec_3/length(data), main="Percent Classified by Selection Rule III", ylim=c(0,1), xlab="e", ylab="Percent Classified")
 #dev.off()
-
-
-
-# Testing on MNIST data.
-# Loading data.
-#train_images_bin = file("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/train-images-idx3-ubyte", "rb")
-#train_labels_bin = file("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/train-labels-idx1-ubyte", "rb")
-#test_images_bin = file("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/t10k-images-idx3-ubyte", "rb")
-#test_labels_bin = file("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/t10k-labels-idx1-ubyte", "rb")
-#m = matrix(readBin(train_images_bin, integer(), size=1, n=28*28, endian="big"), 28, 28)
-#image(m)
-#library(darch)
-#readMNIST("MNISTdata/")
-#load("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/test.RData")
-#load("/Users/kevinoconnor/Documents/School/STAT278/FinalPaper/MNISTdata/train.RData")
-
-
-
